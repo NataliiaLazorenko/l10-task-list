@@ -13,8 +13,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// To pass data to the template we can use a second argument of the view function
+// It should be an array, keys would be the names of the variables
 Route::get('/', function () {
-    return 'Main Page';
+    return view('index', [
+        'name' => 'Nataly'
+
+        // If we pass html tags to the variable, they would be escaped by Laravel and displayed as text
+        // 'name' => '<b>Nataly</b>' // will be escaped
+        // 'name' => '<script></script>' // will be escaped
+    ]);
 });
 
 // ->name('route_name') - adds the name to the route
