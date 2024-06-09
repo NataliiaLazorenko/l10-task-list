@@ -14,5 +14,30 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return 'Main Page';
 });
+
+// ->name('route_name') - adds the name to the route
+Route::get('/hello', function () {
+    return 'Hello';
+})->name('hello');
+
+// Redirects from 'hallo' route to 'hello
+Route::get('/hallo', function () {
+    // return redirect('/hello');
+    return redirect()->route('hello'); // redirects to the named route 'hello'
+});
+
+Route::get('/greet/{name}', function ($name) {
+    return 'Hello ' . $name . "!";
+});
+
+// Fallback route - all routes that don't exist will redirect to this page 
+Route::fallback(function () {
+    return 'Still got somewhere';
+});
+
+// GET
+// POST 
+// PUT 
+// DELETE 
