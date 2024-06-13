@@ -1,0 +1,31 @@
+# Docker lets us run software by using images, which can be described as small littleboxes, that contain some software pre-installed
+# In this case, we have two:
+# - mariadb:10.8.3 - MariaDB server, an open source version of MySQL
+# - adminer - simple PHP script for database management
+# From this images Docker will create running instances called containers, which only job is to run the single piece of software
+version: "3.9"
+services:
+  mysql:
+    # We can use any database client that we prefer (eg. Table Plus, MySQL workbench)
+    image: mariadb:10.8.3
+    # Below line is for Mac M1 users
+    platform: linux/arm64/v8
+    # We will use password authentication in MySQL
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    # We may pass some settings using environment variables
+    environment:
+      # The database root password (we will set it to be `root`
+      MYSQL_ROOT_PASSWORD: root
+    # We want to expose some ports from the container to our machine,
+    # which means that in the container this port (3306) is open to connections and
+    # :3306 will also be mapped to our host machine (Mac system) and we will be able
+    # to connect ti this posrt using any database management tool
+    ports:
+      - 3306:3306
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      # Under localhost:8080 we will be able to visit this database management tool
+      - 8080:8080
