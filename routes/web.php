@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -66,9 +67,13 @@ $tasks = [
     ),
 ];
 
+Route::get('/', function () {
+    return redirect()->route('tasks.index');
+});
+
 // To pass data to the template we can use a second argument of the view function
 // It should be an array, keys would be the names of the variables
-Route::get('/', function () use ($tasks) {
+Route::get('/tasks', function () use ($tasks) {
     return view('index', [
         'tasks' => $tasks
 
@@ -78,8 +83,21 @@ Route::get('/', function () use ($tasks) {
     ]);
 })->name('tasks.index');
 
-Route::get('/{id}', function ($id) {
-    return 'One single task';
+Route::get('/tasks/{id}', function ($id) use ($tasks) {
+        /* 
+         * In PHP Arrays are primitive data types, not objects
+         * To be able to interact with arrays using object oriented way, we can use `collect` function - it turns
+         * array into a Laravel's collection object, which lets us call methods (eg. firstWhere)
+         */
+        $task = collect($tasks)->firstWhere('id', $id);
+
+        if(!$task) {
+            // `abort` function will just stop the request with a specific response code
+            abort(Response::HTTP_NOT_FOUND);
+        }
+
+        // return view named 'show' and pass $task ti the view
+    return view('show', ['task' => $task]);
 })->name('tasks.show');
 
 // // ->name('route_name') - adds the name to the route
