@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Task;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,7 +26,7 @@ Route::get('/tasks', function () {
     return view('index', [
         // 'tasks' => \App\Models\Task::all(), // will fetch all the records of a particular model
         // 'tasks' => \App\Models\Task::latest()->where('completed', true)->get(), // will fetch only completed tasks
-        'tasks' => \App\Models\Task::latest()->get(), // will fetch the most recent tasks first
+        'tasks' => Task::latest()->get(), // will fetch the most recent tasks first
 
         // If we pass html tags to the variable, they would be escaped by Laravel and displayed as text
         // 'name' => '<b>Nataly</b>' // will be escaped
@@ -43,14 +44,35 @@ Route::get('/tasks/{id}', function ($id) {
     // 'findOrFail' - if it won't find a record by specific primary key ('id' in our case), it will call the abort function with 404 code
 
     // return view named 'show' and pass $task to the view
-    return view('show', ['task' => \App\Models\Task::findOrFail($id)]);
+    return view('show', ['task' => Task::findOrFail($id)]);
 })->name('tasks.show');
 
 // 'request' gives us access to the data that is being sent
 Route::post('/tasks', function (Request $request) {
-    // dd - dump and die
-    // $request->all() is how you read all the data fields that were submitted to a form
-    dd($request->all());
+    // Data is available inside the 'request'
+    // 'data' will contain an array with only the fields we specified, and this will only work if the validation passes
+    // 'validate' will use all the data that was sent through the form to validate it
+
+    // If validation does not pass, Laravel will redirect the user back to the previous page and
+    // set all validation errors into a session variable 'errors'
+    // Then we can, for example, display those errors next to the form inputs
+    $data = $request->validate([
+        // Inside the array we can specify some fields and the validation rules
+        'title' => 'required|max:255', // '|' is used to separate rules
+        'description' => 'required',
+        'long_description' => 'required',
+    ]);
+
+    // To save the task we need to create a new Task model, set the task properties one by one and
+    // call the model's 'save' method to save changes to the database and redirect user to some other page
+    // $task = new \App\Models\Task; // we can import the Task model instead of using \App\Models\Task
+    $task = new Task;
+    $task->title = $data['title'];
+    $task->description = $data['description'];
+    $task->long_description = $data['long_description'];
+    $task->save();
+
+    return redirect()->route('tasks.show', ['id' => $task->id]); // will redirect user to the newly saved task
 })->name('tasks.store');
 
 // // ->name('route_name') - adds the name to the route

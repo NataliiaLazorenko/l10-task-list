@@ -4,6 +4,9 @@
 @section('title', 'Add task')
 
 @section('content')
+<!-- Validation errors are stored inside the user session.
+Laravel makes errors variable to all views so it doesn't have to be passed from any routes -->
+{{ $errors }}
 <!-- POST method is used to create new stuff (we will always send post request) -->
 <!-- In 'action' parameter we generate the route we are going to submit the form -->
 <form method="POST" action="{{ route ('tasks.store') }}">
