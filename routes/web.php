@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,12 +26,16 @@ Route::get('/tasks', function () {
         // 'tasks' => \App\Models\Task::all(), // will fetch all the records of a particular model
         // 'tasks' => \App\Models\Task::latest()->where('completed', true)->get(), // will fetch only completed tasks
         'tasks' => \App\Models\Task::latest()->get(), // will fetch the most recent tasks first
-        
+
         // If we pass html tags to the variable, they would be escaped by Laravel and displayed as text
         // 'name' => '<b>Nataly</b>' // will be escaped
         // 'name' => '<script></script>' // will be escaped
     ]);
 })->name('tasks.index');
+
+// In cases where we don't need to fetch any additional data, we don't need to use 'get' method of the route class
+// We can just use the 'view', where we would define the URL and pass the name of the view
+Route::view('/tasks/create', 'create')->name('tasks.create');
 
 Route::get('/tasks/{id}', function ($id) {
     // To get one record from the database table using the model, we refer to the model and call it's method
@@ -40,6 +45,13 @@ Route::get('/tasks/{id}', function ($id) {
     // return view named 'show' and pass $task to the view
     return view('show', ['task' => \App\Models\Task::findOrFail($id)]);
 })->name('tasks.show');
+
+// 'request' gives us access to the data that is being sent
+Route::post('/tasks', function (Request $request) {
+    // dd - dump and die
+    // $request->all() is how you read all the data fields that were submitted to a form
+    dd($request->all());
+})->name('tasks.store');
 
 // // ->name('route_name') - adds the name to the route
 // Route::get('/hello', function () {
