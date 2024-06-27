@@ -72,7 +72,10 @@ Route::post('/tasks', function (Request $request) {
     $task->long_description = $data['long_description'];
     $task->save();
 
-    return redirect()->route('tasks.show', ['id' => $task->id]); // will redirect user to the newly saved task
+    return redirect()->route('tasks.show', ['id' => $task->id]) // will redirect user to the newly saved task
+        // with('variable name', 'message') is used to add a Flash message (here it will be displayed after a new task is successfully stored)
+        // Flash messages they are removed, after we access them the first time. They will not be in the session anymore on subsequent requests
+        ->with('success', 'Task created successfully!'); 
 })->name('tasks.store');
 
 // // ->name('route_name') - adds the name to the route
