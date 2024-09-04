@@ -38,6 +38,10 @@ Route::get('/tasks', function () {
 // We can just use the 'view', where we would define the URL and pass the name of the view
 Route::view('/tasks/create', 'create')->name('tasks.create');
 
+Route::get('/tasks/{id}/edit', function ($id) {
+    return view('edit', ['task' => Task::findOrFail($id)]);
+})->name('tasks.edit');
+
 Route::get('/tasks/{id}', function ($id) {
     // To get one record from the database table using the model, we refer to the model and call it's method
     // 'find' - fetches a record from the database by a specific primary key. If it won't find the record in the database, it would return null and we'll get ar error
@@ -77,6 +81,24 @@ Route::post('/tasks', function (Request $request) {
         // Flash messages they are removed, after we access them the first time. They will not be in the session anymore on subsequent requests
         ->with('success', 'Task created successfully!'); 
 })->name('tasks.store');
+
+Route::put('/tasks/{id}', function ($id, Request $request) {
+    $data = $request->validate([
+        'title' => 'required|max:255',
+        'description' => 'required',
+        'long_description' => 'required',
+    ]);
+
+    $task = Task::findOrFail($id);
+    $task->title = $data['title'];
+    $task->description = $data['description'];
+    $task->long_description = $data['long_description'];
+    // We can call save method and Laravel will run an update query
+    $task->save();
+
+    return redirect()->route('tasks.show', ['id' => $task->id])
+        ->with('success', 'Task updated successfully!'); 
+})->name('tasks.update');
 
 // // ->name('route_name') - adds the name to the route
 // Route::get('/hello', function () {
