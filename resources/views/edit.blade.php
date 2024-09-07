@@ -18,7 +18,8 @@ But for cases where we update an existing resource, we should use PUT.
 To solve this, we can use method directive, where we can specify PUT.
 It will add hidden field to be sent with the form (underscore method that will contain the text PUT).
 This is called method spoofing. Laravel will redirect the request with underscore method to a route which has PUT method -->
-<form method="POST" action="{{ route ('tasks.update', ['id' =>$task->id]) }}">
+<form method="POST"
+    action="{{ route ('tasks.update', ['task' =>$task->id]) }}">
     @csrf
     @method('PUT')
     <div>

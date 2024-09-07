@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Requests\TaskRequest;
 use App\Models\Task;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
@@ -38,81 +39,51 @@ Route::get('/tasks', function () {
 // We can just use the 'view', where we would define the URL and pass the name of the view
 Route::view('/tasks/create', 'create')->name('tasks.create');
 
-Route::get('/tasks/{id}/edit', function ($id) {
-    return view('edit', ['task' => Task::findOrFail($id)]);
+// Model binding - feature in Laravel, when Laravel automatically resolves a model instance based on the type hinted variable name in the route definition.
+// Instead of using an 'id' argument, we can rename it to 'task' and use the function argument with the same name.
+// If we add the task class, which is the Task model, we don't need to call findOrFail.  It'll automatically fetch the model from the database.
+// If the model won't be found, it will throw the Model not found exception, which in Laravel means a 404 page.
+Route::get('/tasks/{task}/edit', function (Task $task) {
+    return view('edit', ['task' => $task]);
 })->name('tasks.edit');
 
-Route::get('/tasks/{id}', function ($id) {
+Route::get('/tasks/{task}', function (Task $task) {
     // To get one record from the database table using the model, we refer to the model and call it's method
     // 'find' - fetches a record from the database by a specific primary key. If it won't find the record in the database, it would return null and we'll get ar error
     // 'findOrFail' - if it won't find a record by specific primary key ('id' in our case), it will call the abort function with 404 code
 
     // return view named 'show' and pass $task to the view
-    return view('show', ['task' => Task::findOrFail($id)]);
+    return view('show', ['task' => $task]);
 })->name('tasks.show');
 
 // 'request' gives us access to the data that is being sent
-Route::post('/tasks', function (Request $request) {
-    // Data is available inside the 'request'
-    // 'data' will contain an array with only the fields we specified, and this will only work if the validation passes
-    // 'validate' will use all the data that was sent through the form to validate it
+Route::post('/tasks', function (TaskRequest $request) {
+    // // Data is available inside the 'request'
+    // $data = $request->validated(); // will contain the validated data
 
-    // If validation does not pass, Laravel will redirect the user back to the previous page and
-    // set all validation errors into a session variable 'errors'
-    // Then we can, for example, display those errors next to the form inputs
-    $data = $request->validate([
-        // Inside the array we can specify some fields and the validation rules
-        'title' => 'required|max:255', // '|' is used to separate rules
-        'description' => 'required',
-        'long_description' => 'required',
-    ]);
+    // Instead of setting attributes individually and calling 'save',
+    // We can use the 'Model::create' static method and pass an array with the data.
+    // We can directly pass the validated request data, which returns an array of column names and values
+    $task = Task::create($request->validated());
 
-    // To save the task we need to create a new Task model, set the task properties one by one and
-    // call the model's 'save' method to save changes to the database and redirect user to some other page
-    // $task = new \App\Models\Task; // we can import the Task model instead of using \App\Models\Task
-    $task = new Task;
-    $task->title = $data['title'];
-    $task->description = $data['description'];
-    $task->long_description = $data['long_description'];
-    $task->save();
-
-    return redirect()->route('tasks.show', ['id' => $task->id]) // will redirect user to the newly saved task
+    return redirect()->route('tasks.show', ['task' => $task->id]) // will redirect user to the newly saved task
         // with('variable name', 'message') is used to add a Flash message (here it will be displayed after a new task is successfully stored)
-        // Flash messages they are removed, after we access them the first time. They will not be in the session anymore on subsequent requests
+        // Flash messages will be removed, after we access them the first time. They will not be in the session anymore on subsequent requests
         ->with('success', 'Task created successfully!'); 
 })->name('tasks.store');
 
-Route::put('/tasks/{id}', function ($id, Request $request) {
-    $data = $request->validate([
-        'title' => 'required|max:255',
-        'description' => 'required',
-        'long_description' => 'required',
-    ]);
+Route::put('/tasks/{task}', function (Task $task, TaskRequest $request) {
+    // For updates, use the update method. It works similarly to create but operates on an existing model.
+    $task->update($request->validated());
 
-    $task = Task::findOrFail($id);
-    $task->title = $data['title'];
-    $task->description = $data['description'];
-    $task->long_description = $data['long_description'];
-    // We can call save method and Laravel will run an update query
-    $task->save();
-
-    return redirect()->route('tasks.show', ['id' => $task->id])
+    return redirect()->route('tasks.show', ['task' => $task->id])
         ->with('success', 'Task updated successfully!'); 
 })->name('tasks.update');
-
-// // ->name('route_name') - adds the name to the route
-// Route::get('/hello', function () {
-//     return 'Hello';
-// })->name('hello');
 
 // // Redirects from 'hallo' route to 'hello
 // Route::get('/hallo', function () {
 //     // return redirect('/hello');
 //     return redirect()->route('hello'); // redirects to the named route 'hello'
-// });
-
-// Route::get('/greet/{name}', function ($name) {
-//     return 'Hello ' . $name . "!";
 // });
 
 // Fallback route - all routes that don't exist will redirect to this page 
