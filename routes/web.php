@@ -27,7 +27,12 @@ Route::get('/tasks', function () {
     return view('index', [
         // 'tasks' => \App\Models\Task::all(), // will fetch all the records of a particular model
         // 'tasks' => \App\Models\Task::latest()->where('completed', true)->get(), // will fetch only completed tasks
-        'tasks' => Task::latest()->get(), // will fetch the most recent tasks first
+
+        // To use pagination, replace the get method with 'paginate'. The 'paginate' method calls get internally but ensures
+        // results are divided into pages. It also generates pagination links for the Blade template and automatically
+        // reads any query parameters in the URL to determine the current page.
+        // We can also set the number of elements per page by passing a number as a parameter to the paginate method.
+        'tasks' => Task::latest()->paginate(10), // latest will fetch the most recent tasks first
 
         // If we pass html tags to the variable, they would be escaped by Laravel and displayed as text
         // 'name' => '<b>Nataly</b>' // will be escaped
