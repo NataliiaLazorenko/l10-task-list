@@ -27,7 +27,12 @@ Laravel makes errors variable to all views so it doesn't have to be passed from 
         </label>
         <!-- We use both the 'name' and 'id' parameter because 'name' would be used as the name of the data submitted by the form.
         And 'id' attribute lets us bind a specific label to the input -->
-        <input type="text" name="title" id="title" />
+        <!-- When some values provided are not valid, errors will occur when clicking the 'Add Task' button.
+        All the fields will be cleared. To save the values already entered, we can use a helper function called 'old'.
+        This function can be called on every input to ensure that the correct values are not lost.
+        'Old' helper only works with the forms that are sent using the POST method, including forms that are sent using the method spoofing.
+        We shouldn't use this old helper with sensitive information, like passwords -->
+        <input type="text" name="title" id="title" value="{{ old('title') }}"/>
         <!-- To display the user input errors we can use 'error' directive. Inside it we can get access to a variable 'message' -->
         @error('title')
             <p class="error-message">{{ $message }}</p>
@@ -38,7 +43,7 @@ Laravel makes errors variable to all views so it doesn't have to be passed from 
         <label for="description">
             Description
         </label>
-        <textarea name="description" id="description" rows="5"></textarea>
+        <textarea name="description" id="description" rows="5">{{ old('description') }}</textarea>
         @error('description')
             <p class="error-message">{{ $message }}</p>
         @enderror
@@ -48,7 +53,7 @@ Laravel makes errors variable to all views so it doesn't have to be passed from 
         <label for="long_description">
             Long Description
         </label>
-        <textarea name="long_description" id="long_description" rows="10"></textarea>
+        <textarea name="long_description" id="long_description" rows="10">{{ old('long_description') }}</textarea>
         @error('long_description')
             <p class="error-message">{{ $message }}</p>
         @enderror
