@@ -72,6 +72,13 @@ Route::post('/tasks', function (TaskRequest $request) {
         ->with('success', 'Task created successfully!'); 
 })->name('tasks.store');
 
+Route::delete('/tasks/{task}', function (Task $task) {
+    $task->delete();
+
+    return redirect()->route('tasks.index')
+        ->with('success', 'Task deleted successfully!');
+})->name('tasks.destroy');
+
 Route::put('/tasks/{task}', function (Task $task, TaskRequest $request) {
     // For updates, use the update method. It works similarly to create but operates on an existing model.
     $task->update($request->validated());
