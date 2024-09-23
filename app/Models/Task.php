@@ -26,4 +26,10 @@ class Task extends Model
     // public function getRouteKeyName() {
     //     return 'slug';
     // }
+
+    public function toggleComplete()
+    {
+        $this->completed = !$this->completed;
+        $this->save();
+    }
 }

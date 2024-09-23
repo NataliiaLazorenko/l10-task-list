@@ -74,8 +74,16 @@ Route::post('/tasks', function (TaskRequest $request) {
     return redirect()->route('tasks.show', ['task' => $task->id]) // will redirect user to the newly saved task
         // with('variable name', 'message') is used to add a Flash message (here it will be displayed after a new task is successfully stored)
         // Flash messages will be removed, after we access them the first time. They will not be in the session anymore on subsequent requests
-        ->with('success', 'Task created successfully!'); 
+        ->with('success', 'Task created successfully!');
 })->name('tasks.store');
+
+Route::put('/tasks/{task}', function (Task $task, TaskRequest $request) {
+    // For updates, use the update method. It works similarly to create but operates on an existing model.
+    $task->update($request->validated());
+
+    return redirect()->route('tasks.show', ['task' => $task->id])
+        ->with('success', 'Task updated successfully!');
+})->name('tasks.update');
 
 Route::delete('/tasks/{task}', function (Task $task) {
     $task->delete();
@@ -84,19 +92,22 @@ Route::delete('/tasks/{task}', function (Task $task) {
         ->with('success', 'Task deleted successfully!');
 })->name('tasks.destroy');
 
-Route::put('/tasks/{task}', function (Task $task, TaskRequest $request) {
-    // For updates, use the update method. It works similarly to create but operates on an existing model.
-    $task->update($request->validated());
+Route::put('/tasks/{task}/toggle-complete', function (Task $task) {
+    $task->toggleComplete();
 
-    return redirect()->route('tasks.show', ['task' => $task->id])
-        ->with('success', 'Task updated successfully!'); 
-})->name('tasks.update');
+    //  The back function will simply navigate to the previous page. We can use it since we'll be clicking from the task view page
+    return redirect()->back()->with('success', 'Task updated successfully!');
+})->name('tasks.toggle-complete');
 
 // // Redirects from 'hallo' route to 'hello
 // Route::get('/hallo', function () {
 //     // return redirect('/hello');
 //     return redirect()->route('hello'); // redirects to the named route 'hello'
 // });
+
+Route::get('/recent-posts/{days_ago?}', function ($daysAgo = 20) {
+    return 'Posts from ' . $daysAgo . ' days ago';
+});
 
 // Fallback route - all routes that don't exist will redirect to this page 
 Route::fallback(function () {
