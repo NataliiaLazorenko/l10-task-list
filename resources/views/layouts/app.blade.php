@@ -4,6 +4,27 @@
 <head>
     <title>Laravel 10 Task List App</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- To extract a long list of classes into a reusable class, add a style block in our layout file (app.blade.php) below the Tailwind script.
+    We need to add comment to prevent the Blade formatter from reformatting the CSS, as it’s not entirely valid CSS and is parsed by the Tailwind Play CDN.
+    If we save changes without the comment, the formatter will break it.
+    So we add the comment at the beginning to disable the Blade formatter for the block and wright after the styles to enable it again -->
+
+    {{-- blade-formatter-disable --}}
+    <style type="text/tailwindcss">
+        .btn {
+            /* To apply multiple classes to a single element or class in Tailwind, use the @apply directive followed by the list of classes
+            Now, in the template, we can simply use the btn class */
+            /* Pseudo-classes can be used in Tailwind. For example, hover:bg-slate-50 - changes the background to a very light gray on hover.
+            Each additional class applied must have its own separate hover pseudo-class  */
+            @apply rounded-md px-2 py-1 text-center font-medium text-slate-700 shadow-sm ring-1 ring-slate-700/10 hover:bg-slate-50
+        }
+
+        .link {
+            @apply font-medium text-gray-700 underline decoration-pink-500
+        }
+    </style>
+    {{-- blade-formatter-enable --}}
+
     @yield('styles')
 </head>
 
