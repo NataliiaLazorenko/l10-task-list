@@ -35,10 +35,10 @@ This is called method spoofing. Laravel will redirect the request with underscor
         <!-- If someone is editing a task, they will pass the task title. The double question mark operator (??) will use
         task->title if it's not null without throwing any errors; otherwise, it will fall back to old('title') -->
 
-        <!-- For conditional styling of error messages we can use class directive and a special errors collection with a 'has' method to check for specific field errors.
+        <!-- For conditional styling of error messages we can use @class directive and a special errors collection with a 'has' method to check for specific field errors.
             @class(array: ['border-red-500'=>$errors->has('title')])
         If an error exists for the title, we can dynamically apply a class to highlight the field
-        Alternatively, we can use the error directive to handle validation errors directly in the class attribute:
+        Alternatively, we can use the @error directive to handle validation errors directly in the class attribute:
             class="@error('title') border-red-500 @enderror" -->
         <input type="text" name="title" id="title"
             @class(array: ['border-red-500'=>$errors->has('title')])
@@ -57,7 +57,7 @@ This is called method spoofing. Laravel will redirect the request with underscor
             Description
         </label>
         <textarea name="description" id="description"
-            @class(array: ['border-red-500'=>$errors->has('description')])
+            @class(array: ['border-red-500'=>$errors->has('title')])
             rows="5">{{ $task->description ?? old('description') }}</textarea>
         @error('description')
         <p class="error">{{ $message }}</p>
@@ -69,14 +69,13 @@ This is called method spoofing. Laravel will redirect the request with underscor
             Long Description
         </label>
         <textarea name="long_description" id="long_description"
-            @class(array: ['border-red-500'=>$errors->has('long_description')])
             rows="10">{{ $task->long_description ?? old('long_description') }}</textarea>
         @error('long_description')
         <p class="error">{{ $message }}</p>
         @enderror
     </div>
 
-    <div class="flex items-center gap-2">
+    <div>
         <button type="submit" class="btn">
             <!-- We show different button text depending on whether the task is set -->
             @isset($task)
@@ -85,7 +84,6 @@ This is called method spoofing. Laravel will redirect the request with underscor
             Add Task
             @endisset
         </button>
-        <a href="{{ route('tasks.index')}}" class="link">Cancel</a>
     </div>
 </form>
 @endsection
